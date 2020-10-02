@@ -57,65 +57,65 @@ impl Component for PollModel {
     fn view(&self) -> Html {
         html! {
             <div class="poll">
-                    <form>
+                <form>
                     <h1 class="title">{"Create a Poll"}</h1>
                     <div class="field is-horizontal">
-                    <div class="field-label is-normal">
-                        <label class="label">{"Question"}</label>
-                      </div>
-                      <div class="field-body">
-                      <div class="field">
-                        <div class="control">
-                            <input class="input" type="text" placeholder="How many holes does a straw have?.."/>
+                        <div class="field-label is-normal">
+                            <label class="label">{"Question"}</label>
                         </div>
-                        </div>
+                        <div class="field-body">
+                            <div class="field">
+                                <div class="control">
+                                    <input class="input" type="text" placeholder="How many holes does a straw have?.." />
+                                </div>
+                            </div>
                         </div>
                     </div>
                     { for self.state.answers.iter().map(|q| self.view_answer(q)) }
-        <div class="field is-horizontal">
-                    <div class="field-label is-normal">
-                        <label class="label">{""}</label>
-                      </div>
-                      <div class="field-body">
-                      <div class="field is-grouped">
-          <p class="control is-expanded">
-            <input class="input" type="text" placeholder="One" value=&self.state.answer_value oninput=self.link.callback(|e: InputData| PollMsg::UpdateAnswer(e.value))/>
-          </p>
-          <p class="control">
-            <a onclick=self.link.callback(|_| PollMsg::SubmitAnswer) class="button is-info">
-            {"+"}
-            </a>
-          </p>
-          </div>
-          </div>
-        </div>
-                    </form>
+                    <div class="field is-horizontal">
+                        <div class="field-label is-normal">
+                            <label class="label">{""}</label>
+                        </div>
+                        <div class="field-body">
+                            <div class="field is-grouped">
+                                <p class="control is-expanded">
+                                    <input class="input" type="text" placeholder="One" value=&self.state.answer_value
+                                        oninput=self.link.callback(|e: InputData| PollMsg::UpdateAnswer(e.value)) />
+                                </p>
+                                <p class="control">
+                                    <a onclick=self.link.callback(|_| PollMsg::SubmitAnswer) class="button is-info">
+                                        {"+"}
+                                    </a>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
-                }
+        }
     }
 }
 
 impl PollModel {
     fn view_answer(&self, answer: &str) -> Html {
         html! {
-
-        <div class="field is-horizontal">
-                    <div class="field-label is-normal">
-                        <label class="label">{""}</label>
-                      </div>
-                      <div class="field-body">
-                      <div class="field has-addons">
-          <p class="control is-expanded">
-            <input class="input" type="text" value={answer}/>
-          </p>
-          <p class="control">
-            <a onclick=self.link.callback(|_| PollMsg::SubmitAnswer) class="button is-danger">
-            {"x"}
-            </a>
-          </p>
-          </div>
-          </div>
-          </div>
+            <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                    <label class="label">{""}</label>
+                </div>
+                <div class="field-body">
+                    <div class="field has-addons">
+                        <p class="control is-expanded">
+                            <input class="input" type="text" value={answer} />
+                        </p>
+                        <p class="control">
+                            <a onclick=self.link.callback(|_| PollMsg::SubmitAnswer) class="button is-danger">
+                                {"x"}
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
         }
     }
 }
