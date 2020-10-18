@@ -4,8 +4,9 @@ use wasm_bindgen::prelude::*;
 use yew::prelude::*;
 use yew_router::prelude::*;
 
+pub mod api;
 pub mod poll;
-use poll::PollModel;
+use poll::{CreatePoll, ShowPoll};
 
 #[derive(Switch, Debug, Clone)]
 pub enum AppRoute {
@@ -15,33 +16,22 @@ pub enum AppRoute {
     Index,
 }
 
-struct Model {
-    link: ComponentLink<Self>,
-    value: i64,
+struct Layout {
+    _link: ComponentLink<Self>,
 }
 
-enum Msg {
-    AddOne,
-}
-
-impl Component for Model {
-    type Message = Msg;
+impl Component for Layout {
+    type Message = ();
     type Properties = ();
     fn create(_: Self::Properties, link: ComponentLink<Self>) -> Self {
-        Self { link, value: 0 }
+        Self { _link: link }
     }
 
-    fn update(&mut self, msg: Self::Message) -> ShouldRender {
-        match msg {
-            Msg::AddOne => self.value += 1,
-        }
-        true
+    fn update(&mut self, _msg: Self::Message) -> ShouldRender {
+        false
     }
 
     fn change(&mut self, _props: Self::Properties) -> ShouldRender {
-        // Should only return "true" if new properties are different to
-        // previously received properties.
-        // This component has no properties so we will always return "false".
         false
     }
 
@@ -52,8 +42,10 @@ impl Component for Model {
                     <Router<AppRoute, ()>
                         render = Router::render(|switch: AppRoute| {
                             match switch {
-                                AppRoute::Poll(id) => html!{<PollModel/>},
-                                AppRoute::Index => html!{<PollModel/>},
+                                AppRoute::Poll(id) => {
+                                    html!(<ShowPoll poll_id={id} />)
+                                },
+                                AppRoute::Index => html!{<CreatePoll/>},
                             }
                         })
                     />
@@ -66,13 +58,5 @@ impl Component for Model {
 
 #[wasm_bindgen(start)]
 pub fn run_app() {
-    App::<Model>::new().mount_to_body();
-}
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
+    App::<Layout>::new().mount_to_body();
 }
