@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use anyhow::Error;
 use serde::{Deserialize, Serialize};
 use yew::format::{Json, Nothing};
@@ -9,7 +11,7 @@ const BASE_URL: &str = "http://localhost:8000";
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PollChoice {
-    pub id: usize,
+    pub id: i32,
     pub poll_id: usize,
     pub details: String,
     pub created_at: String,
@@ -17,7 +19,7 @@ pub struct PollChoice {
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PollMetadata {
-    pub id: usize,
+    pub id: i32,
     pub uuid: String,
     pub title: String,
     pub created_at: String,
@@ -38,6 +40,12 @@ pub struct CreatePoll {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreatePollResponse {
     pub poll: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Vote {
+    pub voter: String,
+    pub choices: HashMap<i32, i32>,
 }
 
 pub fn get_poll<C, M, F>(id: &str, link: &ComponentLink<C>, callback: F) -> FetchTask
@@ -72,6 +80,31 @@ where
 
     let post_request = Request::put(format!("{}/api/v1/polls", BASE_URL))
         .body(Json(&poll))
+        .unwrap();
+    let callback = link.callback(callback);
+    FetchService::fetch(post_request, callback).unwrap()
+}
+
+pub fn vote<S, C, M, F>(
+    poll_id: &str,
+    voter: S,
+    choices: HashMap<i32, i32>,
+    link: &ComponentLink<C>,
+    callback: F,
+) -> FetchTask
+where
+    S: Into<String>,
+    C: Component,
+    M: Into<C::Message>,
+    F: Fn(Response<Nothing>) -> M + 'static,
+{
+    let vote = Vote {
+        voter: voter.into(),
+        choices,
+    };
+
+    let post_request = Request::post(format!("{}/api/v1/polls/{}/vote", BASE_URL, poll_id))
+        .body(Json(&vote))
         .unwrap();
     let callback = link.callback(callback);
     FetchService::fetch(post_request, callback).unwrap()

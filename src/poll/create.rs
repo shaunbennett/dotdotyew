@@ -5,6 +5,16 @@ use yew::prelude::*;
 use yew::services::fetch::FetchTask;
 use yew_router::prelude::*;
 
+const ANSWER_SUGGESTIONS: [&str; 7] = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+];
+
 #[derive(Serialize, Deserialize, Debug)]
 struct State {
     title: String,
@@ -92,54 +102,84 @@ impl Component for CreatePoll {
     }
 
     fn view(&self) -> Html {
+        let valid_choices = self.state.choices.iter().filter(|s| s.len() > 0).count();
+        let can_submit = self.state.title.len() > 0 && valid_choices >= 2;
         let button_class = if self.state.loading {
             "button is-primary is-loading"
         } else {
             "button is-primary"
         };
-        html! {
-            <div class="poll">
-                <form>
-                    <h1 class="title">{"Create a Poll"}</h1>
-                    <div class="field is-horizontal">
-                        <div class="field-label is-normal">
-                            <label class="label">{"Question"}</label>
-                        </div>
-                        <div class="field-body">
-                            <div class="field">
-                                <div class="control">
-                                    <input class="input" type="text" placeholder="How many holes does a straw have?.."
-                                        value=&self.state.title oninput=self.link.callback(|e: InputData|
-                                        Msg::UpdateTitle(e.value)) />
+        html! (
+            <div class="columns is-mobile is-centered">
+                <div class="column is-half">
+                    <div class="poll">
+                        <div class="panel is-primary">
+                            <p class="panel-heading">
+                                <div class="level">
+                                    <div class="level-left">
+                                        <div class="level-item">
+                                            {"Create a Dot Poll"}
+                                        </div>
+                                    </div>
+                                    <div class="level-right">
+                                        <div class="level-item">
+                                            {""}
+                                        </div>
+                                    </div>
                                 </div>
+                            </p>
+                            <div class="panel-block">
+                                <form class="control">
+                                    <div class="field is-horizontal">
+                                        <div class="field-label is-normal">
+                                            <label class="label">{"Title"}</label>
+                                        </div>
+                                        <div class="field-body">
+                                            <div class="field">
+                                                <div class="control">
+                                                    <input class="input" type="text"
+                                                        placeholder="Which day of the week should we select?..."
+                                                        value=&self.state.title oninput=self.link.callback(|e:
+                                                        InputData| Msg::UpdateTitle(e.value)) />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    { for self.state.choices.iter().enumerate().map(|(i, _)| self.view_answer(i)) }
+                                    <div class="field is-grouped is-grouped-right">
+                                        <p class="control">
+                                            <a class={button_class} onclick=self.link.callback(|_| Msg::Submit)
+                                                disabled={!can_submit}>
+                                                {"Create Poll"}
+                                            </a>
+                                        </p>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
-                    { for self.state.choices.iter().enumerate().map(|(i, _)| self.view_answer(i)) }
-                    <div class="field is-grouped is-grouped-right">
-                        <p class="control">
-                            <a class={button_class} onclick=self.link.callback(|_| Msg::Submit)>
-                                {"Create Poll"}
-                            </a>
-                        </p>
-                    </div>
-                </form>
+                </div>
             </div>
-        }
+        )
     }
 }
 
 impl CreatePoll {
     fn view_answer(&self, i: usize) -> Html {
+        let placeholder = if i < ANSWER_SUGGESTIONS.len() {
+            ANSWER_SUGGESTIONS[i]
+        } else {
+            ""
+        };
         html! {
             <div class="field is-horizontal">
                 <div class="field-label is-normal">
-                    <label class="label">{if i == 0 { "Answers" } else { "" }}</label>
+                    <label class="label">{if i == 0 { "Choices" } else { "" }}</label>
                 </div>
                 <div class="field-body">
                     <div class="field has-addons">
                         <p class="control is-expanded">
-                            <input class="input" type="text" placeholder="" value=&self.state.choices[i]
+                            <input class="input" type="text" placeholder={placeholder} value=&self.state.choices[i]
                                 oninput=self.link.callback(move |e: InputData| Msg::UpdateChoice(i, e.value)) />
                         </p>
                     </div>
