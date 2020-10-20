@@ -5,6 +5,7 @@ use yew::events::MouseEvent;
 use yew::format::Json;
 use yew::prelude::*;
 use yew::services::fetch::FetchTask;
+use yew::services::storage::{Area, StorageService};
 
 #[derive(Properties, Clone, PartialEq)]
 pub struct Props {
@@ -13,6 +14,7 @@ pub struct Props {
 }
 
 struct State {
+    voted: bool,
     poll: Option<api::Poll>,
     votes: HashMap<i32, i32>,
     name: String,
@@ -24,11 +26,15 @@ pub enum Msg {
     RemoveDot(i32),
     UpdateName(String),
     FetchSuccess(api::Poll),
+    SubmitVote,
     FetchFailed,
+    VoteSuccess,
+    VoteFailed,
 }
 
 pub struct ShowPoll {
     link: ComponentLink<Self>,
+    storage: StorageService,
     state: State,
     props: Props,
     tasks: Vec<FetchTask>,
@@ -39,6 +45,8 @@ impl Component for ShowPoll {
     type Properties = Props;
 
     fn create(props: Self::Properties, link: ComponentLink<Self>) -> Self {
+        let storage = StorageService::new(Area::Local).expect("browser storage disabled");
+
         // On creation, start fetching the poll from the backend
         let task = api::get_poll(&props.poll_id, &link, |response| {
             if let (meta, Json(Ok(body))) = response.into_parts() {
@@ -49,15 +57,31 @@ impl Component for ShowPoll {
             Msg::FetchFailed
         });
 
+        let state = {
+            if let Json(Ok(votes)) = storage.restore(&format!("com.dotdotyew.votes.{}", &props.poll_id)) {
+                State {
+                    poll: None,
+                    name: "".into(),
+                    votes,
+                    dots_remaining: 0,
+                    voted: true,
+                }
+            } else  {
+                State {
+                    poll: None,
+                    name: "".into(),
+                    votes: HashMap::new(),
+                    dots_remaining: 2,
+                    voted: false,
+                }
+            }
+        };
+
         Self {
             link,
+            storage,
             props,
-            state: State {
-                poll: None,
-                name: "".into(),
-                votes: HashMap::new(),
-                dots_remaining: 2,
-            },
+            state,
             tasks: vec![task],
         }
     }
@@ -96,6 +120,27 @@ impl Component for ShowPoll {
                 }
                 None => false,
             },
+            Msg::SubmitVote => {
+                let task = api::vote(&self.props.poll_id, &self.state.name, self.state.votes.clone(), &self.link, |response| {
+                    let (meta, _) = response.into_parts();
+                    if meta.status.is_success() {
+                        return Msg::VoteSuccess;
+                    }
+                    Msg::VoteFailed
+                });
+                self.tasks.push(task);
+                true
+            },
+            Msg::VoteSuccess => {
+                self.state.voted = true;
+
+                self.storage.store(&format!("com.dotdotyew.votes.{}", &self.props.poll_id), Json(&self.state.votes));
+                true
+            },
+            Msg::VoteFailed => {
+                // TODO
+                true
+            }
         }
     }
 
@@ -119,46 +164,11 @@ impl Component for ShowPoll {
 
     fn view(&self) -> Html {
         if let Some(poll) = &self.state.poll {
-            let can_submit = self.state.name.len() > 0 && self.state.dots_remaining == 0;
-            html!(
-                <div class="columns is-mobile is-centered">
-                    <div class="column is-half">
-                        <div class="content">
-                            <div class="panel is-primary">
-                                <p class="panel-heading">
-                                    <div class="level">
-                                        <div class="level-left">
-                                            <div class="level-item">
-                                                {&poll.poll.title}
-                                            </div>
-                                        </div>
-                                        <div class="level-right">
-                                            <div class="level-item">
-                                                {format!("Dots Left: {}", self.state.dots_remaining)}
-                                            </div>
-                                        </div>
-                                    </div>
-                                </p>
-                                <div class="panel-block notification is-light">
-                                    <p class="has-text-centered">{"Click on a choice to allocate dots. You must allocate
-                                        all dots to vote."}</p>
-                                </div>
-                                { for poll.choices.iter().map(|choice| self.vote_choice(choice)) }
-                                <div class="panel-block">
-                                    <input class="input is-fullwidth" type="text" placeholder="Your Name..."
-                                        value=&self.state.name oninput=self.link.callback(|e: InputData|
-                                        Msg::UpdateName(e.value)) />
-                                </div>
-                                <div class="panel-block">
-                                    <button class="button is-primary is-fullwidth" disabled={!can_submit}>
-                                        {"Submit Votes"}
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )
+            if self.state.voted {
+                self.show_voted(poll)
+            } else {
+                self.show_can_vote(poll)
+            }
         } else {
             html!(
                 <h1>{"Loading..."}</h1>
@@ -168,8 +178,78 @@ impl Component for ShowPoll {
 }
 
 impl ShowPoll {
-    fn can_vote(&self) -> bool {
-        true
+    fn show_can_vote(&self, poll: &api::Poll) -> Html {
+        let can_submit = self.state.name.len() > 0 && self.state.dots_remaining == 0;
+        html!(
+            <div class="columns is-mobile is-centered">
+                <div class="column is-half">
+                    <div class="content">
+                        <div class="panel is-primary">
+                            <p class="panel-heading">
+                                <div class="level">
+                                    <div class="level-left">
+                                        <div class="level-item">
+                                            {&poll.poll.title}
+                                        </div>
+                                    </div>
+                                    <div class="level-right">
+                                        <div class="level-item">
+                                            {format!("Dots Left: {}", self.state.dots_remaining)}
+                                        </div>
+                                    </div>
+                                </div>
+                            </p>
+                            <div class="panel-block notification is-light">
+                                <p class="has-text-centered">{"Click on a choice to allocate dots. You must allocate
+                                    all dots to vote."}</p>
+                            </div>
+                            { for poll.choices.iter().map(|choice| self.vote_choice(choice)) }
+                            <div class="panel-block">
+                                <input class="input is-fullwidth" type="text" placeholder="Your Name..."
+                                    value=&self.state.name oninput=self.link.callback(|e: InputData|
+                                    Msg::UpdateName(e.value)) />
+                            </div>
+                            <div class="panel-block">
+                                <button class="button is-primary is-fullwidth" disabled={!can_submit} onclick=self.link.callback(|_| Msg::SubmitVote)>
+                                    {"Submit Votes"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    fn show_voted(&self, poll: &api::Poll) -> Html {
+        html!(
+            <div class="columns is-mobile is-centered">
+                <div class="column is-half">
+                    <div class="content">
+                        <div class="panel is-primary">
+                            <p class="panel-heading">
+                                <div class="level">
+                                    <div class="level-left">
+                                        <div class="level-item">
+                                            {&poll.poll.title}
+                                        </div>
+                                    </div>
+                                </div>
+                            </p>
+                            <div class="panel-block notification is-light">
+                                <p class="has-text-centered">{"You voted in this poll already"}</p>
+                            </div>
+                            { for poll.choices.iter().map(|choice| self.vote_choice(choice)) }
+                            <div class="panel-block">
+                                <button class="button is-primary is-fullwidth">
+                                    {"View Results"}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        )
     }
 
     fn vote_choice(&self, choice: &api::PollChoice) -> Html {
@@ -189,7 +269,7 @@ impl ShowPoll {
                 <div class="level-right">
                     <div class="level-item">
                         { for (0..votes).map(|_| html!(<span class="icon has-text-info"><i class="fas fa-circle"></i></span>)) }
-                        { if votes > 0 { html!(<span class="icon"><div class="delete" onclick=self.link.callback(move |e: MouseEvent| { e.stop_propagation(); Msg::RemoveDot(id) })></div></span>) } else { html!()} }
+                        { if votes > 0 && !self.state.voted { html!(<span class="icon"><div class="delete" onclick=self.link.callback(move |e: MouseEvent| { e.stop_propagation(); Msg::RemoveDot(id) })></div></span>) } else { html!()} }
                     </div>
                 </div>
               </div>
