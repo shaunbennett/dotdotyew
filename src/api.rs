@@ -43,9 +43,26 @@ pub struct CreatePollResponse {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct Vote {
+pub struct VoteSubmission {
     pub voter: String,
     pub choices: HashMap<i32, i32>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct Vote {
+    pub id: i32,
+    pub poll_id: i32,
+    pub choice_id: i32,
+    pub dots: i32,
+    pub voter: String,
+    pub created_at: String,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct PollResults {
+    pub poll: PollMetadata,
+    pub choices: Vec<PollChoice>,
+    pub votes: Vec<Vote>,
 }
 
 pub fn get_poll<C, M, F>(id: &str, link: &ComponentLink<C>, callback: F) -> FetchTask
@@ -98,7 +115,7 @@ where
     M: Into<C::Message>,
     F: Fn(Response<Nothing>) -> M + 'static,
 {
-    let vote = Vote {
+    let vote = VoteSubmission {
         voter: voter.into(),
         choices,
     };
@@ -108,4 +125,17 @@ where
         .unwrap();
     let callback = link.callback(callback);
     FetchService::fetch(post_request, callback).unwrap()
+}
+
+pub fn get_results<C, M, F>(id: &str, link: &ComponentLink<C>, callback: F) -> FetchTask
+    where
+        C: Component,
+        M: Into<C::Message>,
+        F: Fn(Response<Json<Result<PollResults, Error>>>) -> M + 'static,
+{
+    let get_request = Request::get(format!("{}/api/v1/polls/{}/results", BASE_URL, id))
+        .body(Nothing)
+        .unwrap();
+    let callback = link.callback(callback);
+    FetchService::fetch(get_request, callback).unwrap()
 }
