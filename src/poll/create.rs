@@ -111,7 +111,7 @@ impl Component for CreatePoll {
         };
         html! (
             <div class="columns is-mobile is-centered">
-                <div class="column is-half">
+                <div class="column is-half-desktop">
                     <div class="poll">
                         <div class="panel is-primary">
                             <p class="panel-heading">
@@ -119,11 +119,6 @@ impl Component for CreatePoll {
                                     <div class="level-left">
                                         <div class="level-item">
                                             {"Create a Dot Poll"}
-                                        </div>
-                                    </div>
-                                    <div class="level-right">
-                                        <div class="level-item">
-                                            {""}
                                         </div>
                                     </div>
                                 </div>

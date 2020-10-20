@@ -58,7 +58,9 @@ impl Component for ShowPoll {
         });
 
         let state = {
-            if let Json(Ok(votes)) = storage.restore(&format!("com.dotdotyew.votes.{}", &props.poll_id)) {
+            if let Json(Ok(votes)) =
+                storage.restore(&format!("com.dotdotyew.votes.{}", &props.poll_id))
+            {
                 State {
                     poll: None,
                     name: "".into(),
@@ -66,7 +68,7 @@ impl Component for ShowPoll {
                     dots_remaining: 0,
                     voted: true,
                 }
-            } else  {
+            } else {
                 State {
                     poll: None,
                     name: "".into(),
@@ -121,22 +123,31 @@ impl Component for ShowPoll {
                 None => false,
             },
             Msg::SubmitVote => {
-                let task = api::vote(&self.props.poll_id, &self.state.name, self.state.votes.clone(), &self.link, |response| {
-                    let (meta, _) = response.into_parts();
-                    if meta.status.is_success() {
-                        return Msg::VoteSuccess;
-                    }
-                    Msg::VoteFailed
-                });
+                let task = api::vote(
+                    &self.props.poll_id,
+                    &self.state.name,
+                    self.state.votes.clone(),
+                    &self.link,
+                    |response| {
+                        let (meta, _) = response.into_parts();
+                        if meta.status.is_success() {
+                            return Msg::VoteSuccess;
+                        }
+                        Msg::VoteFailed
+                    },
+                );
                 self.tasks.push(task);
                 true
-            },
+            }
             Msg::VoteSuccess => {
                 self.state.voted = true;
 
-                self.storage.store(&format!("com.dotdotyew.votes.{}", &self.props.poll_id), Json(&self.state.votes));
+                self.storage.store(
+                    &format!("com.dotdotyew.votes.{}", &self.props.poll_id),
+                    Json(&self.state.votes),
+                );
                 true
-            },
+            }
             Msg::VoteFailed => {
                 // TODO
                 true
@@ -182,7 +193,7 @@ impl ShowPoll {
         let can_submit = self.state.name.len() > 0 && self.state.dots_remaining == 0;
         html!(
             <div class="columns is-mobile is-centered">
-                <div class="column is-half">
+                <div class="column is-half-desktop">
                     <div class="content">
                         <div class="panel is-primary">
                             <p class="panel-heading">
