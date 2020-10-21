@@ -235,7 +235,7 @@ impl ShowPoll {
     fn show_voted(&self, poll: &api::Poll) -> Html {
         html!(
             <div class="columns is-mobile is-centered">
-                <div class="column is-half">
+                <div class="column is-half-desktop">
                     <div class="content">
                         <div class="panel is-primary">
                             <p class="panel-heading">
