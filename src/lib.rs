@@ -6,13 +6,14 @@ use yew_router::prelude::*;
 
 pub mod api;
 pub mod poll;
+pub mod component;
 use poll::{CreatePoll, ShowPoll};
 
 #[derive(Switch, Debug, Clone)]
 pub enum AppRoute {
-    #[to = "/poll/{id}"]
+    #[to = "/dotdotyew/poll/{id}"]
     Poll(String),
-    #[to = "/"]
+    #[to = "/dotdotyew"]
     Index,
 }
 

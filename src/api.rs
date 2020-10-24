@@ -7,7 +7,11 @@ use yew::prelude::*;
 use yew::services::fetch::{FetchTask, Request, Response};
 use yew::services::FetchService;
 
+#[cfg(debug_assertions)]
 const BASE_URL: &str = "http://localhost:8000";
+#[cfg(not(debug_assertions))]
+const BASE_URL: &str = "https://www.dotdotvote.com";
+
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PollChoice {
@@ -128,10 +132,10 @@ where
 }
 
 pub fn get_results<C, M, F>(id: &str, link: &ComponentLink<C>, callback: F) -> FetchTask
-    where
-        C: Component,
-        M: Into<C::Message>,
-        F: Fn(Response<Json<Result<PollResults, Error>>>) -> M + 'static,
+where
+    C: Component,
+    M: Into<C::Message>,
+    F: Fn(Response<Json<Result<PollResults, Error>>>) -> M + 'static,
 {
     let get_request = Request::get(format!("{}/api/v1/polls/{}/results", BASE_URL, id))
         .body(Nothing)

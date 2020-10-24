@@ -1,4 +1,5 @@
 use crate::api;
+use crate::component::{Panel, PanelBlock, PanelHeading};
 use serde::{Deserialize, Serialize};
 use yew::format::Json;
 use yew::prelude::*;
@@ -110,51 +111,45 @@ impl Component for CreatePoll {
             "button is-primary"
         };
         html! (
-            <div class="columns is-mobile is-centered">
-                <div class="column is-half-desktop">
-                    <div class="poll">
-                        <div class="panel is-primary">
-                            <p class="panel-heading">
-                                <div class="level">
-                                    <div class="level-left">
-                                        <div class="level-item">
-                                            {"Create a Dot Poll"}
-                                        </div>
-                                    </div>
-                                </div>
-                            </p>
-                            <div class="panel-block">
-                                <form class="control">
-                                    <div class="field is-horizontal">
-                                        <div class="field-label is-normal">
-                                            <label class="label">{"Title"}</label>
-                                        </div>
-                                        <div class="field-body">
-                                            <div class="field">
-                                                <div class="control">
-                                                    <input class="input" type="text"
-                                                        placeholder="Which day of the week should we select?..."
-                                                        value=&self.state.title oninput=self.link.callback(|e:
-                                                        InputData| Msg::UpdateTitle(e.value)) />
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    { for self.state.choices.iter().enumerate().map(|(i, _)| self.view_answer(i)) }
-                                    <div class="field is-grouped is-grouped-right">
-                                        <p class="control">
-                                            <a class={button_class} onclick=self.link.callback(|_| Msg::Submit)
-                                                disabled={!can_submit}>
-                                                {"Create Poll"}
-                                            </a>
-                                        </p>
-                                    </div>
-                                </form>
+            <Panel>
+                <PanelHeading>
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                {"Create a Dot Poll"}
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                </PanelHeading>
+                <PanelBlock>
+                    <form class="control">
+                        <div class="field is-horizontal">
+                            <div class="field-label is-normal">
+                                <label class="label">{"Title"}</label>
+                            </div>
+                            <div class="field-body">
+                                <div class="field">
+                                    <div class="control">
+                                        <input class="input" type="text"
+                                            placeholder="Which day of the week should we select?..."
+                                            value=&self.state.title oninput=self.link.callback(|e:
+                                            InputData| Msg::UpdateTitle(e.value)) />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        { for self.state.choices.iter().enumerate().map(|(i, _)| self.view_answer(i)) }
+                        <div class="field is-grouped is-grouped-right">
+                            <p class="control">
+                                <a class={button_class} onclick=self.link.callback(|_| Msg::Submit)
+                                    disabled={!can_submit}>
+                                    {"Create Poll"}
+                                </a>
+                            </p>
+                        </div>
+                    </form>
+                </PanelBlock>
+            </Panel>
         )
     }
 }

@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 use crate::api;
+use crate::component::{Panel, PanelBlock, PanelHeading};
 use yew::events::MouseEvent;
 use yew::format::Json;
 use yew::prelude::*;
@@ -192,74 +193,62 @@ impl ShowPoll {
     fn show_can_vote(&self, poll: &api::Poll) -> Html {
         let can_submit = self.state.name.len() > 0 && self.state.dots_remaining == 0;
         html!(
-            <div class="columns is-mobile is-centered">
-                <div class="column is-half-desktop">
-                    <div class="content">
-                        <div class="panel is-primary">
-                            <p class="panel-heading">
-                                <div class="level">
-                                    <div class="level-left">
-                                        <div class="level-item">
-                                            {&poll.poll.title}
-                                        </div>
-                                    </div>
-                                    <div class="level-right">
-                                        <div class="level-item">
-                                            {format!("Dots Left: {}", self.state.dots_remaining)}
-                                        </div>
-                                    </div>
-                                </div>
-                            </p>
-                            <div class="panel-block notification is-light">
-                                <p class="has-text-centered">{"Click on a choice to allocate dots. You must allocate
-                                    all dots to vote."}</p>
+            <Panel>
+                <PanelHeading>
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                {&poll.poll.title}
                             </div>
-                            { for poll.choices.iter().map(|choice| self.vote_choice(choice)) }
-                            <div class="panel-block">
-                                <input class="input is-fullwidth" type="text" placeholder="Your Name..."
-                                    value=&self.state.name oninput=self.link.callback(|e: InputData|
-                                    Msg::UpdateName(e.value)) />
-                            </div>
-                            <div class="panel-block">
-                                <button class="button is-primary is-fullwidth" disabled={!can_submit} onclick=self.link.callback(|_| Msg::SubmitVote)>
-                                    {"Submit Votes"}
-                                </button>
+                        </div>
+                        <div class="level-right">
+                            <div class="level-item">
+                                {format!("Dots Left: {}", self.state.dots_remaining)}
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                </PanelHeading>
+                <PanelBlock notification=true light=true>
+                    <p class="has-text-centered">{"Click on a choice to allocate dots. You must allocate
+                        all dots to vote."}</p>
+                </PanelBlock>
+                { for poll.choices.iter().map(|choice| self.vote_choice(choice)) }
+                <PanelBlock>
+                    <input class="input is-fullwidth" type="text" placeholder="Your Name..."
+                        value=&self.state.name oninput=self.link.callback(|e: InputData|
+                        Msg::UpdateName(e.value)) />
+                </PanelBlock>
+                <PanelBlock>
+                    <button class="button is-primary is-fullwidth" disabled={!can_submit} onclick=self.link.callback(|_| Msg::SubmitVote)>
+                        {"Submit Votes"}
+                    </button>
+                </PanelBlock>
+            </Panel>
         )
     }
 
     fn show_voted(&self, poll: &api::Poll) -> Html {
         html!(
-            <div class="columns is-mobile is-centered">
-                <div class="column is-half">
-                    <div class="content">
-                        <div class="panel is-primary">
-                            <p class="panel-heading">
-                                <div class="level">
-                                    <div class="level-left">
-                                        <div class="level-item">
-                                            {&poll.poll.title}
-                                        </div>
-                                    </div>
-                                </div>
-                            </p>
-                            <div class="panel-block notification is-light">
-                                <p class="has-text-centered">{"You voted in this poll already"}</p>
-                            </div>
-                            { for poll.choices.iter().map(|choice| self.vote_choice(choice)) }
-                            <div class="panel-block">
-                                <button class="button is-primary is-fullwidth">
-                                    {"View Results"}
-                                </button>
+            <Panel>
+                <PanelHeading>
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                {&poll.poll.title}
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
+                </PanelHeading>
+                <PanelBlock notification=true light=true>
+                    <p class="has-text-centered">{"You voted in this poll already"}</p>
+                </PanelBlock>
+                { for poll.choices.iter().map(|choice| self.vote_choice(choice)) }
+                <PanelBlock>
+                    <button class="button is-primary is-fullwidth">
+                        {"View Results"}
+                    </button>
+                </PanelBlock>
+            </Panel>
         )
     }
 
