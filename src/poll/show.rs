@@ -231,26 +231,32 @@ impl ShowPoll {
 
     fn show_voted(&self, poll: &api::Poll) -> Html {
         html!(
-            <Panel>
-                <PanelHeading>
-                    <div class="level">
-                        <div class="level-left">
-                            <div class="level-item">
-                                {&poll.poll.title}
+            <div class="columns is-mobile is-centered">
+                <div class="column is-half-desktop">
+                    <div class="content">
+                        <div class="panel is-primary">
+                            <p class="panel-heading">
+                                <div class="level">
+                                    <div class="level-left">
+                                        <div class="level-item">
+                                            {&poll.poll.title}
+                                        </div>
+                                    </div>
+                                </div>
+                            </p>
+                            <div class="panel-block notification is-light">
+                                <p class="has-text-centered">{"You voted in this poll already"}</p>
+                            </div>
+                            { for poll.choices.iter().map(|choice| self.vote_choice(choice)) }
+                            <div class="panel-block">
+                                <button class="button is-primary is-fullwidth">
+                                    {"View Results"}
+                                </button>
                             </div>
                         </div>
                     </div>
-                </PanelHeading>
-                <PanelBlock class="notification is-success is-light">
-                    <p class="has-text-centered">{"Your vote was sent! Click below to see results"}</p>
-                </PanelBlock>
-                { for poll.choices.iter().map(|choice| self.vote_choice(choice)) }
-                <PanelBlock>
-                    <button class="button is-primary is-fullwidth">
-                        {"View Results"}
-                    </button>
-                </PanelBlock>
-            </Panel>
+                </div>
+            </div>
         )
     }
 
