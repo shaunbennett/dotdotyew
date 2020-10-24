@@ -183,7 +183,9 @@ impl Component for ShowPoll {
             }
         } else {
             html!(
-                <h1>{"Loading..."}</h1>
+                <Panel>
+                    <PanelHeading/>
+                </Panel>
             )
         }
     }
@@ -208,7 +210,7 @@ impl ShowPoll {
                         </div>
                     </div>
                 </PanelHeading>
-                <PanelBlock notification=true light=true>
+                <PanelBlock class="notification is-light">
                     <p class="has-text-centered">{"Click on a choice to allocate dots. You must allocate
                         all dots to vote."}</p>
                 </PanelBlock>
@@ -239,8 +241,8 @@ impl ShowPoll {
                         </div>
                     </div>
                 </PanelHeading>
-                <PanelBlock notification=true light=true>
-                    <p class="has-text-centered">{"You voted in this poll already"}</p>
+                <PanelBlock class="notification is-success is-light">
+                    <p class="has-text-centered">{"Your vote was sent! Click below to see results"}</p>
                 </PanelBlock>
                 { for poll.choices.iter().map(|choice| self.vote_choice(choice)) }
                 <PanelBlock>
@@ -256,7 +258,7 @@ impl ShowPoll {
         let votes = self.state.votes.get(&choice.id).cloned().unwrap_or(0);
         let id = choice.id;
         html!(
-            <a class="panel-block" style="display:block;" onclick=self.link.callback(move |_| Msg::AddDot(id))>
+            <PanelBlock tag="a" style="display:block;" onclick=self.link.callback(move |_| Msg::AddDot(id))>
               <div class="level">
                 <div class="level-left">
                     <span class="panel-icon">
@@ -273,7 +275,7 @@ impl ShowPoll {
                     </div>
                 </div>
               </div>
-            </a>
+            </PanelBlock>
         )
     }
 }

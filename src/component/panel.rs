@@ -7,21 +7,28 @@ pub type PanelBlock = Pure<PanelBlockImpl>;
 
 #[derive(Clone, Properties, PartialEq)]
 pub struct PanelImpl {
+    #[prop_or_default]
     pub children: Children,
 }
 
 #[derive(Clone, Properties, PartialEq)]
 pub struct PanelHeadingImpl {
+    #[prop_or_default]
     pub children: Children,
 }
 
 #[derive(Clone, Properties, PartialEq)]
 pub struct PanelBlockImpl {
+    #[prop_or_default]
     pub children: Children,
-    #[prop_or(false)]
-    pub notification: bool,
-    #[prop_or(false)]
-    pub light: bool,
+    #[prop_or_default]
+    pub class: Option<String>,
+    #[prop_or_else(|| "".into())]
+    pub style: String,
+    #[prop_or_else(|| "div".into())]
+    pub tag: String,
+    #[prop_or_else(Callback::noop)]
+    pub onclick: Callback<MouseEvent>,
 }
 
 impl PureComponent for PanelImpl {
@@ -50,17 +57,15 @@ impl PureComponent for PanelHeadingImpl {
 
 impl PureComponent for PanelBlockImpl {
     fn view(&self) -> Html {
-        let mut class = "panel-block".to_owned();
-        if self.notification {
-            class += " notification";
+        let mut classes = Classes::from("panel-block");
+        if let Some(extra_classes) = &self.class {
+            classes = classes.extend(extra_classes);
         }
-        if self.light {
-            class += " is-light";
-        }
+        let tag = self.tag.clone();
         html! (
-            <a class={class}>
+            <@{tag} style=self.style class=classes onclick=self.onclick.clone()>
                 { self.children.clone() }
-            </a>
+            </@>
         )
     }
 }

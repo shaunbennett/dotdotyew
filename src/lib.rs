@@ -5,8 +5,8 @@ use yew::prelude::*;
 use yew_router::prelude::*;
 
 pub mod api;
-pub mod poll;
 pub mod component;
+pub mod poll;
 use poll::{CreatePoll, ShowPoll};
 
 #[derive(Switch, Debug, Clone)]
@@ -50,7 +50,6 @@ impl Component for Layout {
                             }
                         })
                     />
-
                 </div>
             </section>
         }
