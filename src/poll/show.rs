@@ -7,6 +7,7 @@ use yew::format::Json;
 use yew::prelude::*;
 use yew::services::fetch::FetchTask;
 use yew::services::storage::{Area, StorageService};
+use yew_router::prelude::*;
 
 #[derive(Properties, Clone, PartialEq)]
 pub struct Props {
@@ -246,9 +247,9 @@ impl ShowPoll {
                 </PanelBlock>
                 { for poll.choices.iter().map(|choice| self.vote_choice(choice)) }
                 <PanelBlock>
-                    <button class="button is-primary is-fullwidth">
+                    <RouterButton<crate::AppRoute> route={crate::AppRoute::PollResults(self.props.poll_id.clone())} classes="button is-primary is-fullwidth">
                         {"View Results"}
-                    </button>
+                    </RouterButton<crate::AppRoute>>
                 </PanelBlock>
             </Panel>
         )

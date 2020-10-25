@@ -1,7 +1,7 @@
 use crate::api;
 use crate::component::{Panel, PanelBlock, PanelHeading};
 use std::collections::hash_map::Entry;
-use wasm_bindgen::__rt::std::collections::HashMap;
+use std::collections::HashMap;
 use yew::format::Json;
 use yew::prelude::*;
 use yew::services::fetch::FetchTask;
