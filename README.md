@@ -2,15 +2,22 @@
 
 ### Compiling
 
+I use [trunk](https://github.com/thedodd/trunk) to build and package the assets. View the repo for installation instructions.
+
+
+Once installed, you can build the project. The output files are placed in `dist/`
 ```
-wasm-pack build --target web --out-name wasm --out-dir ./static
+trunk build
 ```
 
 ### Running
 
-You just need to host a web server over the static directory. I use [http-server](https://www.npmjs.com/package/http-server).
+Trunk can host your files and rebuild whenever you make a change.
 
 ```
-http-server ./static -p 9999
+trunk serve
 ```
 
+### Production
+
+Trunk does not run any wasm optimization tools like `wasm-snip` or `wasm-opt`. Instead, I manually run these on the output wasm file before deploying to production.

@@ -242,7 +242,7 @@ impl ShowPoll {
                     </div>
                 </PanelHeading>
                 <PanelBlock class="notification is-success is-light">
-                    <p class="has-text-centered">{"You voted in this poll already"}</p>
+                    <p class="has-text-centered">{"Vote succeeded! Click below to see results."}</p>
                 </PanelBlock>
                 { for poll.choices.iter().map(|choice| self.vote_choice(choice)) }
                 <PanelBlock>
