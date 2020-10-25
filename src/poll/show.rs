@@ -210,7 +210,7 @@ impl ShowPoll {
                         </div>
                     </div>
                 </PanelHeading>
-                <PanelBlock class="notification is-light">
+                <PanelBlock class="notification is-light mb-0">
                     <p class="has-text-centered">{"Click on a choice to allocate dots. You must allocate
                         all dots to vote."}</p>
                 </PanelBlock>
@@ -241,7 +241,7 @@ impl ShowPoll {
                         </div>
                     </div>
                 </PanelHeading>
-                <PanelBlock class="notification is-success is-light">
+                <PanelBlock class="notification is-success is-light mb-0">
                     <p class="has-text-centered">{"Vote succeeded! Click below to see results."}</p>
                 </PanelBlock>
                 { for poll.choices.iter().map(|choice| self.vote_choice(choice)) }
