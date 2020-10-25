@@ -131,7 +131,7 @@ impl PollResults {
     }
 
     fn show_choice(&self, choice: &api::PollChoice) -> Html {
-        let votes: Vec<&'static str> = self
+        let votes: Vec<(&String, &'static str)> = self
             .state
             .results
             .as_ref()
@@ -141,7 +141,7 @@ impl PollResults {
             .filter(|vote| vote.choice_id == choice.id)
             .flat_map(|vote| {
                 let voter = &vote.voter;
-                (0..vote.dots).map(move |_| *self.state.voter_colours.get(voter).unwrap())
+                (0..vote.dots).map(move |_| (voter, *self.state.voter_colours.get(voter).unwrap()))
             })
             .collect();
 
@@ -158,7 +158,7 @@ impl PollResults {
                 </div>
                 <div class="level-right">
                     <div class="level-item">
-                        { for votes.iter().map(|c| html!(<span class="icon" style={format!("color:{};", c)}><i class="fas fa-circle"></i></span>)) }
+                        { for votes.iter().map(|c| html!(<span class="icon" style={format!("color:{};", c.1)} data-tooltip={c.0}><i class="fas fa-circle"></i></span>)) }
                     </div>
                 </div>
               </div>
