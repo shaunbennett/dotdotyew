@@ -193,7 +193,7 @@ impl Component for ShowPoll {
 
 impl ShowPoll {
     fn show_can_vote(&self, poll: &api::Poll) -> Html {
-        let can_submit = self.state.name.len() > 0 && self.state.dots_remaining == 0;
+        let can_submit = !self.state.name.is_empty() && self.state.dots_remaining == 0;
         html!(
             <Panel>
                 <PanelHeading>

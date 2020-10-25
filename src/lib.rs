@@ -7,10 +7,12 @@ use yew_router::prelude::*;
 pub mod api;
 pub mod component;
 pub mod poll;
-use poll::{CreatePoll, ShowPoll};
+use poll::{CreatePoll, PollResults, ShowPoll};
 
 #[derive(Switch, Debug, Clone)]
 pub enum AppRoute {
+    #[to = "/dotdotyew/poll/{id}/results"]
+    PollResults(String),
     #[to = "/dotdotyew/poll/{id}"]
     Poll(String),
     #[to = "/dotdotyew"]
@@ -43,10 +45,9 @@ impl Component for Layout {
                     <Router<AppRoute, ()>
                         render = Router::render(|switch: AppRoute| {
                             match switch {
-                                AppRoute::Poll(id) => {
-                                    html!(<ShowPoll poll_id={id} />)
-                                },
-                                AppRoute::Index => html!{<CreatePoll/>},
+                                AppRoute::PollResults(id) => html!(<PollResults poll_id={id} />),
+                                AppRoute::Poll(id) => html!(<ShowPoll poll_id={id} />),
+                                AppRoute::Index => html!(<CreatePoll/>),
                             }
                         })
                     />
