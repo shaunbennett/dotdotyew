@@ -6,15 +6,9 @@ use yew::format::Json;
 use yew::prelude::*;
 use yew::services::fetch::FetchTask;
 
-const COLOURS: [&str; 64] = [
-    "#6B6882", "#5FAD4E", "#A75740", "#A5FFD2", "#FFB167", "#009BFF", "#E85EBE", "#005F39",
-    "#620E00", "#008F9C", "#98FF52", "#7544B1", "#B500FF", "#00FF78", "#FF6E41", "#FFE502",
-    "#91D0CB", "#BE9970", "#968AE8", "#BB8800", "#43002C", "#DEFF74", "#00FFC6", "#0E4CA1",
-    "#001544", "#C28C9F", "#FF74A3", "#01D0FF", "#004754", "#E56FFE", "#788231", "#9E008E",
-    "#A42400", "#00AE7E", "#683D3B", "#BDC6FF", "#263400", "#BDD393", "#00B917", "#FF0056",
-    "#FF937E", "#6A826C", "#FF029D", "#FE8900", "#7A4782", "#7E2DD2", "#85A900", "#D5FF00",
-    "#95003A", "#007DB5", "#FF00F6", "#FFEEE8", "#774D00", "#90FB92", "#0076FF", "#010067",
-    "#00FF00", "#0000FF", "#FF0000", "#01FFFE", "#FFA6FE", "#FFDB66", "#006401", "#000000",
+const COLOURS: [&str; 12] = [
+    "#8ecbb7", "#e4aee0", "#88ddad", "#efa6a6", "#6adcdc", "#e8ba85", "#77cdef", "#d7e599",
+    "#acb9ec", "#a0c583", "#c6f0ce", "#d1c99a",
 ];
 
 #[derive(Properties, Clone, PartialEq)]
@@ -73,7 +67,7 @@ impl Component for PollResults {
                         Entry::Occupied(_) => {}
                         Entry::Vacant(entry) => {
                             entry.insert(COLOURS[colour_index]);
-                            colour_index = (colour_index + 1) % 64;
+                            colour_index = (colour_index + 1) % 12;
                         }
                     }
                 }
