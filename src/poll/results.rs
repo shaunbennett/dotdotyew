@@ -140,13 +140,13 @@ impl PollResults {
             .collect();
 
         html!(
-            <PanelBlock tag="a" style="display:block;">
+            <PanelBlock style="display:block;">
               <div class="level">
                 <div class="level-left">
-                    <span class="panel-icon">
-                        <i class="fas fa-angle-right" aria-hidden="true"></i>
-                    </span>
                     <div class="level-item">
+                        <span class="panel-icon">
+                            <i class="fas fa-angle-right" aria-hidden="true"></i>
+                        </span>
                         {&choice.details}
                     </div>
                 </div>

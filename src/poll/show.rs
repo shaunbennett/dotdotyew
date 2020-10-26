@@ -243,7 +243,7 @@ impl ShowPoll {
                     </div>
                 </PanelHeading>
                 <PanelBlock class="notification is-success is-light mb-0">
-                    <p class="has-text-centered">{"Vote succeeded! Click below to see results."}</p>
+                    <p class="has-text-centered">{"Vote sent! Click below to see results."}</p>
                 </PanelBlock>
                 { for poll.choices.iter().map(|choice| self.vote_choice(choice)) }
                 <PanelBlock>
@@ -258,14 +258,15 @@ impl ShowPoll {
     fn vote_choice(&self, choice: &api::PollChoice) -> Html {
         let votes = self.state.votes.get(&choice.id).cloned().unwrap_or(0);
         let id = choice.id;
+        let block_tag = if self.state.voted { "div" } else { "a" };
         html!(
-            <PanelBlock tag="a" style="display:block;" onclick=self.link.callback(move |_| Msg::AddDot(id))>
+            <PanelBlock tag={block_tag} style="display:block;" onclick=self.link.callback(move |_| Msg::AddDot(id))>
               <div class="level">
                 <div class="level-left">
-                    <span class="panel-icon">
-                        <i class="fas fa-angle-right" aria-hidden="true"></i>
-                    </span>
                     <div class="level-item">
+                        <span class="panel-icon">
+                            <i class="fas fa-angle-right" aria-hidden="true"></i>
+                        </span>
                         {&choice.details}
                     </div>
                 </div>
