@@ -103,6 +103,7 @@ impl Component for PollResults {
 impl PollResults {
     fn show_results(&self, results: &api::PollResults) -> Html {
         let title = results.poll.title.clone() + " - Results";
+        let votes = self.state.voter_colours.len();
         html!(
             <Panel>
                 <PanelHeading>
@@ -114,7 +115,7 @@ impl PollResults {
                         </div>
                         <div class="level-right">
                             <div class="level-item">
-                                {format!("{} Votes Submitted", self.state.voter_colours.len())}
+                                {format!("{} Vote{} Submitted", votes, if votes > 1 { "s" } else { "" })}
                             </div>
                         </div>
                     </div>
